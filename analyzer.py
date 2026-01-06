@@ -88,11 +88,50 @@ class ManadoAnalyzer:
                 recommendations.append(f"Ganti '{t['text']}' dengan 'nyanda' atau 'nda'.")
                 rule_violations += 1
         
+        # DETEKSI TIPE KALIMAT & RAGAM (MOVED HERE - BEFORE message_html)
+        sentence_type = "Kalimat Berita (Deklaratif)"
+        voice_type = "Aktif (Active)"
+        
+        # 1. Cek Kalimat Tanya
+        question_words = ["sapa", "apa", "dimane", "kiapa", "bagimana", "kapan", "barapa", "mana"]
+        question_particles = ["kang", "dang", "sto"]
+        is_question = any(t["text"] in question_words for t in tokenized) or \
+                      (tokenized and tokenized[-1]["text"] in question_particles) or \
+                      "?" in kalimat
+                      
+        if is_question:
+            sentence_type = "Kalimat Tanya (Interogatif)"
+            
+        # 2. Cek Kalimat Perintah
+        imperative_particles = ["jo", "mari", "coba"]
+        is_imperative = (tokenized and tokenized[-1]["text"] == "jo") or \
+                        any(t["text"] in imperative_particles for t in tokenized) or \
+                        "!" in kalimat
+                        
+        if is_imperative and not is_question:
+            sentence_type = "Kalimat Perintah (Imperatif)"
+
+        # 3. Cek Ragam (Aktif/Pasif/Nominal)
+        has_passive_marker = False
+        
+        for t in predikat_tokens:
+            if t["text"].startswith("ta") or t["text"] == "dapa" or t["text"].startswith("ka"):
+                has_passive_marker = True
+        
+        if has_passive_marker:
+            voice_type = "Pasif (Passive)"
+        elif not predikat_tokens:
+             voice_type = "Nominal / Tidak Lengkap"
+
+        # Add to report BEFORE generating HTML
+        analysis_report.append(f"ℹ Tipe: {sentence_type} | Ragam: {voice_type}")
+        
         is_valid = rule_violations == 0
         message_html = "<br/>".join(analysis_report)
         if recommendations:
             message_html += "<br/><br/><b>Rekomendasi Perbaikan:</b><br/>" + "<br/>".join(recommendations)
 
+        # DERIVATION & MERMAID
         derivation = []
         mermaid_lines = ["graph TD"]
         mermaid_lines.append("ROOT[Struktur Kalimat SPOK]")
@@ -134,73 +173,18 @@ class ManadoAnalyzer:
                 derivation.append(f"{step_counter}. {type_code} → '{t['text']}'")
                 step_counter += 1
 
-        # 4. TRANSLASI (INDONESIA)
-        # Gabungkan semua kamus untuk lookup
+        # TRANSLASI (INDONESIA)
         ALL_DICTS = {**SUBJEK, **AUX, **PREDIKAT, **OBJEK, **KETERANGAN, **PARTIKEL, **POSSESSIVE}
         
         translated_words = []
         for t in tokenized:
             word = t["text"]
-            # Lookup with fallback to original word if unknown
-            # Handle phrase lookups if needed, but currently tokens are split
-            # For multi-word tokens like "di rumah", they are in the KETERANGAN dict
-            
             if word in ALL_DICTS:
                 translated_words.append(ALL_DICTS[word])
             else:
-                # Try simple stemming or just keep original
                 translated_words.append(word)
-                
-        # DETEKSI TIPE KALIMAT & RAGAM
-        sentence_type = "Kalimat Berita (Deklaratif)"
-        voice_type = "Aktif (Active)"
-        
-        # 1. Cek Kalimat Tanya
-        question_words = ["sapa", "apa", "dimana", "kiapa", "bagimana", "kapan", "barapa", "mana"]
-        question_particles = ["kang", "dang", "sto"]
-        is_question = any(t["text"] in question_words for t in tokenized) or \
-                      (tokenized and tokenized[-1]["text"] in question_particles) or \
-                      "?" in kalimat
-                      
-        if is_question:
-            sentence_type = "Kalimat Tanya (Interogatif)"
-            
-        # 2. Cek Kalimat Perintah
-        imperative_particles = ["jo", "mari", "coba"]
-        is_imperative = (tokenized and tokenized[-1]["text"] == "jo") or \
-                        any(t["text"] in imperative_particles for t in tokenized) or \
-                        "!" in kalimat
-                        
-        if is_imperative and not is_question:
-            sentence_type = "Kalimat Perintah (Imperatif)"
 
-        # 3. Cek Ragam (Aktif/Pasif/Nominal)
-        # Pasif: ada kata 'dapa' atau prefix 'ta-' di predikat (heuristic sederhana)
-        has_passive_marker = False
-        has_nominal_marker = False # Jika predikat bukan kata kerja (e.g. Noun) - ini butuh data POS tag lebih kaya
-        
-        # Cek dapa/ta-
-        for t in predikat_tokens:
-            if t["text"].startswith("ta") or t["text"] == "dapa" or t["text"].startswith("ka"):
-                has_passive_marker = True
-        
-        if not predikat_tokens and subjek_tokens:
-             # Mungkin kalimat nominal e.g. "Dia dokter" -> Dia (S) [Dokter (P - Noun)]
-             # Tapi current logic akan mark 'dokter' as SUBJEK usually logic 1.
-             # Mari kita asumsikan jika Predikat kosong tapi ada OBJEK yg salah class, itu nominal.
-             pass
-
-        if has_passive_marker:
-            voice_type = "Pasif (Passive)"
-        elif not predikat_tokens:
-             voice_type = "Nominal / Tidak Lengkap"
-
-        # Update Message
-        analysis_report.append(f"ℹ Tipe: {sentence_type} | Ragam: {voice_type}")
-
-        # Basic sentence reconstruction
         translation = " ".join(translated_words)
-        # Capitalize first letter
         translation = translation.capitalize()
 
         # Add Styling
