@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manado AI | Next Gen Analyzer</title>
+    <title>Manado AI | Next Gen Language Analyzer</title>
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- GSAP & ScrollTrigger -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@700&display=swap"
@@ -19,25 +21,25 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        display: ['Space Grotesk', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            100: '#fce7f3',
-                            500: '#ec4899',
-                            900: '#831843'
-                        }
-                    }
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], display: ['Space Grotesk', 'sans-serif'] },
+                    colors: { brand: { 100: '#fce7f3', 500: '#ec4899', 900: '#831843' } }
                 }
             }
         }
     </script>
     <style>
         body {
-            background: #fdf2f8;
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
             overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
         }
 
         .glass-panel {
@@ -53,97 +55,346 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
         }
 
-        .hero-blob {
-            position: absolute;
-            filter: blur(80px);
-            z-index: -1;
-            opacity: 0.6;
+        @keyframes gradient-shift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(236, 72, 153, 0.3);
+        }
+
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.95);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 
 <body class="text-slate-800 antialiased selection:bg-pink-200 selection:text-pink-900">
 
-    <!-- Decorative Background -->
-    <div class="hero-blob bg-purple-300 w-96 h-96 rounded-full top-0 left-0 mix-blend-multiply"></div>
-    <div class="hero-blob bg-pink-300 w-96 h-96 rounded-full bottom-0 right-0 mix-blend-multiply"></div>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
 
-    <main class="container mx-auto px-6 h-screen flex flex-col justify-center items-center relative">
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+        <div class="container mx-auto max-w-6xl relative z-10">
 
-        <!-- Hero Section -->
-        <div class="text-center space-y-8 max-w-4xl relative z-10">
-
-            <div
-                class="gsap-hero-item inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 border border-white/60 shadow-sm backdrop-blur-sm">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span class="text-xs font-bold tracking-widest uppercase text-slate-500">System v2.0 Online</span>
+            <!-- Status Badge -->
+            <div class="gsap-hero text-center mb-8 opacity-0 translate-y-10">
+                <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full glass-panel">
+                    <span class="relative flex h-3 w-3">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span class="text-sm font-bold tracking-widest uppercase text-slate-600">AI Engine v2.0
+                        Online</span>
+                </div>
             </div>
 
-            <h1 class="gsap-hero-item font-display text-6xl md:text-8xl font-bold leading-tight">
-                Validasi Bahasa <br />
+            <!-- Main Title -->
+            <h1
+                class="gsap-hero font-display text-6xl md:text-8xl font-bold leading-tight text-center mb-6 opacity-0 translate-y-10">
+                Analisis Bahasa <br />
                 <span class="gradient-text">Manado 2026</span>
             </h1>
 
-            <p class="gsap-hero-item text-xl md:text-2xl text-slate-600 font-light max-w-2xl mx-auto">
-                AI Powered Semantic Analysis & Typo Correction.
-                <br /><span class="text-sm font-mono text-pink-500 mt-2 block">Powered by SPOK Linear Engine</span>
+            <!-- Subtitle -->
+            <p
+                class="gsap-hero text-xl md:text-2xl text-slate-600 font-light max-w-3xl mx-auto text-center mb-4 opacity-0 translate-y-10">
+                AI-Powered Semantic Analysis, Real-time Translation & Advanced Grammar Validation
+            </p>
+            <p class="gsap-hero text-sm font-mono text-pink-500 text-center mb-12 opacity-0 translate-y-10">
+                ⚡ Powered by SPOK Linear Engine | BMM 2026 Compliant
             </p>
 
-            <div class="gsap-hero-item flex justify-center gap-4 mt-8">
+            <!-- CTA Buttons -->
+            <div class="gsap-hero flex flex-wrap justify-center gap-4 mb-16 opacity-0 translate-y-10">
                 <a href="/analyze"
-                    class="group relative px-8 py-4 bg-slate-900 text-white rounded-full font-bold overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-pink-500/20 transition-all duration-300">
+                    class="group relative px-10 py-5 bg-slate-900 text-white rounded-2xl font-bold overflow-hidden shadow-2xl hover:shadow-pink-500/30 transition-all duration-300">
                     <div
                         class="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     </div>
-                    <span class="relative flex items-center gap-3">
+                    <span class="relative flex items-center gap-3 text-lg">
                         Mulai Analisa
-                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none"
+                        <svg class="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                         </svg>
                     </span>
                 </a>
+                <a href="#features"
+                    class="px-10 py-5 glass-panel rounded-2xl font-bold text-slate-700 hover:bg-white/90 transition-all duration-300 shadow-lg text-lg">
+                    Lihat Fitur
+                </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="gsap-stats grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto opacity-0 translate-y-10">
+                <div class="glass-panel p-6 rounded-2xl text-center feature-card">
+                    <div class="text-4xl font-bold gradient-text stat-number" data-target="500">0</div>
+                    <div class="text-sm text-slate-500 mt-2 font-medium">Kata Manado</div>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl text-center feature-card">
+                    <div class="text-4xl font-bold gradient-text stat-number" data-target="99">0</div>
+                    <div class="text-sm text-slate-500 mt-2 font-medium">Akurasi %</div>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl text-center feature-card">
+                    <div class="text-4xl font-bold gradient-text stat-number" data-target="10">0</div>
+                    <div class="text-sm text-slate-500 mt-2 font-medium">Tipe Kalimat</div>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl text-center feature-card">
+                    <div class="text-4xl font-bold gradient-text stat-number" data-target="24">0</div>
+                    <div class="text-sm text-slate-500 mt-2 font-medium">Jam Aktif</div>
+                </div>
             </div>
 
         </div>
 
-        <!-- Floating Elements -->
-        <div
-            class="absolute top-1/4 left-10 hidden lg:block glass-panel p-4 rounded-2xl rotate-[-6deg] hover:rotate-0 transition-transform duration-500 cursor-default float-card">
-            <code class="text-sm font-mono text-pink-600">S → NP VP</code>
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3">
+                </path>
+            </svg>
         </div>
-        <div
-            class="absolute bottom-1/4 right-10 hidden lg:block glass-panel p-4 rounded-2xl rotate-[6deg] hover:rotate-0 transition-transform duration-500 cursor-default float-card">
-            <code class="text-sm font-mono text-purple-600">is_valid: True</code>
-        </div>
+    </section>
 
-    </main>
+    <!-- Features Section -->
+    <section id="features" class="relative py-24 px-6">
+        <div class="container mx-auto max-w-6xl relative z-10">
+
+            <div class="text-center mb-16 opacity-0 gsap-section-reveal">
+                <h1 class="gsap-section-title font-display text-5xl font-bold mb-4">
+                    Fitur <span class="gradient-text">Unggulan</span>
+                </h1>
+                <p class="text-xl text-slate-600">Teknologi AI terdepan untuk analisis bahasa Manado</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="gsap-feature glass-panel p-8 rounded-3xl feature-card opacity-0 translate-y-10">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 pulse-ring">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Validasi SPOK</h3>
+                    <p class="text-slate-600 leading-relaxed">Deteksi otomatis struktur Subjek-Predikat-Objek-Keterangan
+                        dengan akurasi tinggi sesuai BMM 2026.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="gsap-feature glass-panel p-8 rounded-3xl feature-card opacity-0 translate-y-10">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 pulse-ring">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Translasi Real-time</h3>
+                    <p class="text-slate-600 leading-relaxed">Terjemahan instan Manado ke Indonesia dengan animasi
+                        typing effect yang smooth.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="gsap-feature glass-panel p-8 rounded-3xl feature-card opacity-0 translate-y-10">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mb-6 pulse-ring">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Koreksi Typo</h3>
+                    <p class="text-slate-600 leading-relaxed">Saran otomatis untuk kata yang salah eja dengan algoritma
+                        fuzzy matching.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="gsap-feature glass-panel p-8 rounded-3xl feature-card opacity-0 translate-y-10">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 pulse-ring">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Parse Tree Visual</h3>
+                    <p class="text-slate-600 leading-relaxed">Diagram pohon sintaksis interaktif dengan Mermaid.js untuk
+                        visualisasi struktur kalimat.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="gsap-feature glass-panel p-8 rounded-3xl feature-card opacity-0 translate-y-10">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 pulse-ring">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Deteksi Tipe</h3>
+                    <p class="text-slate-600 leading-relaxed">Identifikasi otomatis kalimat tanya, perintah, atau berita
+                        dengan ragam aktif/pasif.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="gsap-feature glass-panel p-8 rounded-3xl feature-card opacity-0 translate-y-10">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 pulse-ring">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Instant Analysis</h3>
+                    <p class="text-slate-600 leading-relaxed">Proses analisis super cepat dengan loading animation dan
+                        confetti celebration.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative py-12 px-6 border-t border-pink-100">
+        <div class="container mx-auto max-w-6xl text-center relative z-10">
+            <p class="text-slate-600 mb-2">© 2026 Manado AI Language Analyzer</p>
+            <p class="text-sm text-slate-400">Built with FastAPI, Tailwind CSS & GSAP</p>
+        </div>
+    </footer>
 
     <script>
-        // Init GSAP
-        document.addEventListener("DOMContentLoaded", (event) => {
+        // Particles.js Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: '#ec4899' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.3, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: '#ec4899', opacity: 0.2, width: 1 },
+                move: { enable: true, speed: 2, direction: 'none', random: true, out_mode: 'out' }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' } },
+                modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+            },
+            retina_detect: true
+        });
+
+        // GSAP Animations
+        document.addEventListener("DOMContentLoaded", () => {
             gsap.registerPlugin(ScrollTrigger);
 
-            // Hero Animation
-            gsap.from(".gsap-hero-item", {
+            // Hero entrance (immediate)
+            gsap.to(".gsap-hero", {
                 duration: 1.2,
-                y: 100,
-                opacity: 0,
+                y: 0,
+                opacity: 1,
                 stagger: 0.2,
-                ease: "power4.out"
+                ease: "power4.out",
+                force3D: true
             });
 
-            // Floating Cards Animation
-            gsap.to(".float-card", {
-                y: -20,
-                duration: 2,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut",
-                stagger: 0.5
+            // Stats reveal
+            gsap.to(".gsap-stats", {
+                scrollTrigger: {
+                    trigger: ".gsap-stats",
+                    start: "top 90%",
+                    toggleActions: "play none none reverse"
+                },
+                duration: 1,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                onComplete: () => {
+                    document.querySelectorAll('.stat-number').forEach(el => {
+                        const target = parseInt(el.dataset.target);
+                        let current = 0;
+                        const increment = target / 50;
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                el.textContent = target + (el.textContent.includes('%') ? '' : '+');
+                                clearInterval(timer);
+                            } else {
+                                el.textContent = Math.floor(current);
+                            }
+                        }, 30);
+                    });
+                }
+            });
+
+            // Features Section Reveal
+            gsap.to(".gsap-section-reveal", {
+                scrollTrigger: {
+                    trigger: "#features",
+                    start: "top 80%",
+                },
+                duration: 1,
+                opacity: 1,
+                y: 0,
+                ease: "power3.out"
+            });
+
+            // Features items stagger
+            gsap.to(".gsap-feature", {
+                scrollTrigger: {
+                    trigger: ".grid", // Trigger when the grid enters
+                    start: "top 85%",
+                },
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                stagger: 0.1,
+                ease: "power2.out"
             });
         });
     </script>
