@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manado AI | Next Gen Analyzer</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@700&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            100: '#fce7f3',
+                            500: '#ec4899',
+                            900: '#831843'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #fdf2f8;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(236, 72, 153, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 antialiased selection:bg-pink-200 selection:text-pink-900">
+
+    <!-- Decorative Background -->
+    <div class="hero-blob bg-purple-300 w-96 h-96 rounded-full top-0 left-0 mix-blend-multiply"></div>
+    <div class="hero-blob bg-pink-300 w-96 h-96 rounded-full bottom-0 right-0 mix-blend-multiply"></div>
+
+    <main class="container mx-auto px-6 h-screen flex flex-col justify-center items-center relative">
+
+        <!-- Hero Section -->
+        <div class="text-center space-y-8 max-w-4xl relative z-10">
+
+            <div
+                class="gsap-hero-item inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 border border-white/60 shadow-sm backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-xs font-bold tracking-widest uppercase text-slate-500">System v2.0 Online</span>
+            </div>
+
+            <h1 class="gsap-hero-item font-display text-6xl md:text-8xl font-bold leading-tight">
+                Validasi Bahasa <br />
+                <span class="gradient-text">Manado 2026</span>
+            </h1>
+
+            <p class="gsap-hero-item text-xl md:text-2xl text-slate-600 font-light max-w-2xl mx-auto">
+                AI Powered Semantic Analysis & Typo Correction.
+                <br /><span class="text-sm font-mono text-pink-500 mt-2 block">Powered by SPOK Linear Engine</span>
+            </p>
+
+            <div class="gsap-hero-item flex justify-center gap-4 mt-8">
+                <a href="/analyze"
+                    class="group relative px-8 py-4 bg-slate-900 text-white rounded-full font-bold overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-pink-500/20 transition-all duration-300">
+                    <div
+                        class="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    </div>
+                    <span class="relative flex items-center gap-3">
+                        Mulai Analisa
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Floating Elements -->
+        <div
+            class="absolute top-1/4 left-10 hidden lg:block glass-panel p-4 rounded-2xl rotate-[-6deg] hover:rotate-0 transition-transform duration-500 cursor-default float-card">
+            <code class="text-sm font-mono text-pink-600">S → NP VP</code>
+        </div>
+        <div
+            class="absolute bottom-1/4 right-10 hidden lg:block glass-panel p-4 rounded-2xl rotate-[6deg] hover:rotate-0 transition-transform duration-500 cursor-default float-card">
+            <code class="text-sm font-mono text-purple-600">is_valid: True</code>
+        </div>
+
+    </main>
+
+    <script>
+        // Init GSAP
+        document.addEventListener("DOMContentLoaded", (event) => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero Animation
+            gsap.from(".gsap-hero-item", {
+                duration: 1.2,
+                y: 100,
+                opacity: 0,
+                stagger: 0.2,
+                ease: "power4.out"
+            });
+
+            // Floating Cards Animation
+            gsap.to(".float-card", {
+                y: -20,
+                duration: 2,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut",
+                stagger: 0.5
+            });
+        });
+    </script>
+</body>
+
+</html>
