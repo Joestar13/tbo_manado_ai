@@ -30,7 +30,7 @@ class ManadoAnalyzer:
             elif t in KETERANGAN: type_ = "KETERANGAN"
             elif t in PARTIKEL: type_ = "PARTIKEL"
             elif t in POSSESSIVE: type_ = "POSSESSIVE"
-            elif t.startswith("ba") and len(t) > 3:
+            elif (t.startswith("ba") or t.startswith("ta") or t.startswith("ma")) and len(t) > 3:
                 type_ = "PREDIKAT"
             else:
                 type_ = "UNKNOWN"

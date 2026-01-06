@@ -10,7 +10,9 @@ SUBJEK = {
     "nyonga": "pemuda", "nona": "nona", "maener": "bapak guru", "tanta": "bibi", 
     "sapa": "siapa", "tuama": "laki-laki", "wewene": "perempuan", "sobat": "sahabat", 
     "tamang": "teman", "bos": "bos", "kapiten": "kapten", "presiden": "presiden", 
-    "tua": "orang tua", "muda": "anak muda"
+    "tua": "orang tua", "muda": "anak muda", "laki": "suami", "bini": "istri",
+    "anak": "anak", "cucu": "cucu", "tutu": "saudara", "nyong": "pemuda",
+    "kaka tua": "kakak tertua", "ade kici": "adik bungsu", "fam": "marga"
 }
 
 AUX = {
@@ -20,7 +22,8 @@ AUX = {
     "bisa": "bisa", "kudu": "harus", "pasti": "pasti", "memang": "memang", 
     "dapa": "bisa/dapat", "tengah": "sedang", "baru": "baru", "lalu": "lalu", 
     "le": "juga", "masi": "masih", "hendak": "hendak", "akan": "akan", 
-    "sedang": "sedang", "sudah": "sudah"
+    "sedang": "sedang", "sudah": "sudah", "pernah": "pernah", "mo pigi": "akan pergi",
+    "mou": "mau", "nimau": "tidak mau", "ndak": "tidak", "singgah": "mampir"
 }
 
 PARTIKEL = {
@@ -50,7 +53,11 @@ PREDIKAT = {
     "baciong": "berciuman", "bapukul": "memukul", "bakuat": "berkuat", 
     "babadiam": "berdiam diri", "bajao": "menjauh", "badekat": "mendekat", 
     "manyasal": "menyesal", "batobo": "berenang", "baroko": "merokok", 
-    "bamabo": "mabuk", "ba": "ber", "ma": "me"
+    "bamabo": "mabuk", "ba": "ber", "ma": "me", "bage": "pukul/bagi",
+    "polo": "peluk", "tjio": "cium", "biar": "biarkan", "tunggu": "tunggu",
+    "lia": "lihat", "dengar": "dengar", "rasa": "rasa", "raba": "sentuh",
+    "tola": "dorong", "tare": "tarik", "angkang": "angkat", "hanyut": "hanyut",
+    "toro": "ikat", "laka": "langkah", "lompa": "lompat", "lari": "lari"
 }
 
 OBJEK = {
@@ -68,7 +75,9 @@ OBJEK = {
     "tomat": "tomat", "bawang": "bawang", "garam": "garam", "gula": "gula", 
     "kopi": "kopi", "teh": "teh", "susu": "susu", "beer": "bir", 
     "cap tikus": "minuman keras", "kepala": "kepala", "tangan": "tangan", 
-    "kaki": "kaki", "mata": "mata", "mulut": "mulut", "rambut": "rambut"
+    "kaki": "kaki", "mata": "mata", "mulut": "mulut", "rambut": "rambut",
+    "piring": "piring", "gelas": "gelas", "sendo": "sendok", "garpu": "garpu",
+    "porok": "garpu", "kompor": "kompor", "meja": "meja", "kursi": "kursi"
 }
 
 KETERANGAN = {
@@ -82,5 +91,8 @@ KETERANGAN = {
     "besok": "besok", "minggu depan": "minggu depan", "bulan depan": "bulan depan", 
     "tahun depan": "tahun depan", "scap": "cepat", "pelang-pelang": "pelan-pelan", 
     "kuat-kuat": "kuat-kuat", "bagus-bagus": "baik-baik", "sama-sama": "bersama-sama", 
-    "sendiri": "sendiri", "rame-rame": "ramai-ramai", "sunyi-sunyi": "senyap"
+    "sendiri": "sendiri", "rame-rame": "ramai-ramai", "sunyi-sunyi": "senyap",
+    "disini": "di sini", "disana": "di sana", "disitu": "di situ",
+    "tadi": "tadi", "skarang": "sekarang", "nantiao": "nanti saja",
+    "biarjo": "biarkan saja", "palsu": "palsu", "asli": "asli"
 }
