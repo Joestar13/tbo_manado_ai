@@ -19,16 +19,23 @@ class ManadoAnalyzer:
             if i + 1 < len(raw_tokens):
                 t1, t2 = raw_tokens[i], raw_tokens[i+1]
                 two_word = f"{t1} {t2}"
+                found_type = None
                 
                 # Check for predefined phrases first
-                found_type = None
                 if two_word in KETERANGAN: found_type = "KETERANGAN"
                 elif two_word in PREDIKAT: found_type = "PREDIKAT"
                 elif two_word in AUX: found_type = "AUX"
                 
                 # Generalized logic: AUX + (SUBJEK/PREDIKAT/OBJEK/KETERANGAN)
                 if not found_type and t1 in AUX:
-                    if t2 in PREDIKAT: found_type = "PREDIKAT"
+                    # Priority 1: Prepositions (di/ka) -> KETERANGAN
+                    if t1 in ["di", "ka", "dari", "pas"]:
+                        found_type = "KETERANGAN"
+                    # Priority 2: Time Markers (so/mo/da/ada) -> PREDIKAT
+                    elif t1 in ["so", "mo", "da", "ada", "bolom", "blum", "bulum"]:
+                        found_type = "PREDIKAT"
+                    # Priority 3: Fallback based on t2
+                    elif t2 in PREDIKAT: found_type = "PREDIKAT"
                     elif t2 in KETERANGAN: found_type = "KETERANGAN"
                     elif t2 in SUBJEK: found_type = "SUBJEK"
                     elif t2 in OBJEK: found_type = "OBJEK"
@@ -36,7 +43,7 @@ class ManadoAnalyzer:
                 if found_type:
                     # Determine sub-token types
                     t1_type = "AUX" if t1 in AUX or t1 in ["di", "ka", "mo", "ada", "so"] else found_type
-                    t2_type = found_type
+                    t2_type = "KETERANGAN" if found_type == "KETERANGAN" and t2 in OBJEK else found_type
                     
                     tokenized.append({
                         "text": two_word, 
