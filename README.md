@@ -96,4 +96,4 @@ Aplikasi ini dirancang dengan estetika **Glassmorphism** dan **Vibrant Dark/Pink
 ## 🤝 Kontribusi
 Project ini dikembangkan untuk kebutuhan akademik dan pelestarian bahasa lokal. Jika Anda ingin berkontribusi dalam pengembangan kamus atau algoritma, silakan lakukan *Pull Request*.
 
-**Made with ❤️ in Manado**
+**Made with ❤️ in Malang for Manado**
