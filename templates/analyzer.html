@@ -13,6 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- SVG Pan Zoom -->
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
 
     <script>
         mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#fce7f3', lineColor: '#ec4899' } });
@@ -77,13 +79,39 @@
             }
         }
 
-        .cursor-blink {
-            animation: blink 1s step-end infinite;
-        }
-
         @keyframes blink {
             50% {
                 opacity: 0;
+            }
+        }
+
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shimmer::after {
+            content: "";
+            position: absolute;
+            top: -150%;
+            left: -150%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(45deg,
+                    transparent 25%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 75%);
+            animation: shimmer 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translate(-10%, -10%);
+            }
+
+            100% {
+                transform: translate(10%, 10%);
             }
         }
     </style>
@@ -182,7 +210,7 @@
                 <div class="lg:col-span-1 space-y-6">
                     <!-- Status Card -->
                     <div
-                        class="glass-card p-6 gsap-fade-up border-t-4 {{ 'border-t-green-500' if result.valid_sintaks else 'border-t-red-500' }} opacity-0 translate-y-[50px]">
+                        class="glass-card shimmer p-6 gsap-fade-up border-t-4 {{ 'border-t-green-500' if result.valid_sintaks else 'border-t-red-500' }} opacity-0 translate-y-[50px]">
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Validation Status</span>
                         <div class="flex items-center gap-4 mt-2">
                             {% if result.valid_sintaks %}
@@ -286,20 +314,23 @@
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Mermaid -->
                     <div
-                        class="glass-card p-6 min-h-[300px] flex flex-col gsap-fade-up relative overflow-hidden opacity-0 translate-y-[50px]">
+                        class="glass-card shimmer p-6 min-h-[400px] flex flex-col gsap-fade-up relative overflow-hidden opacity-0 translate-y-[50px]">
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl pointer-events-none">
                         </div>
                         <div class="flex justify-between items-center mb-4 relative z-10">
                             <h3 class="font-bold text-lg">Visual Parse Tree</h3>
                             <div class="flex gap-2">
-                                <span class="px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-bold">Live
-                                    Graph</span>
+                                <span
+                                    class="px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-bold">Interactive
+                                    Pan & Zoom</span>
                             </div>
                         </div>
-                        <div
-                            class="flex-1 flex justify-center items-center mermaid hover:scale-[1.02] transition-transform duration-500">
-                            {{ result.mermaid | safe }}
+                        <div id="mermaid-container"
+                            class="flex-1 flex justify-center items-center overflow-hidden border border-pink-100/50 rounded-xl bg-white/30 backdrop-blur-sm cursor-grab active:cursor-grabbing">
+                            <div class="mermaid w-full h-full flex justify-center items-center">
+                                {{ result.mermaid | safe }}
+                            </div>
                         </div>
                     </div>
 
@@ -361,6 +392,21 @@
                 duration: 1,
                 ease: "power2.out"
             });
+        });
+
+        // Mermaid Pan Zoom
+        window.addEventListener('load', () => {
+            const mermaidSvg = document.querySelector('#mermaid-container svg');
+            if (mermaidSvg) {
+                svgPanZoom(mermaidSvg, {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,
+                    minZoom: 0.1,
+                    maxZoom: 10
+                });
+            }
         });
 
         function replaceWord(typo, correction) {

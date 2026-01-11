@@ -17,9 +17,35 @@ class ManadoAnalyzer:
             t = raw_tokens[i]
             
             if i + 1 < len(raw_tokens):
-                two_word = f"{t} {raw_tokens[i+1]}"
-                if two_word in KETERANGAN:
-                    tokenized.append({"text": two_word, "type": "KETERANGAN"})
+                t1, t2 = raw_tokens[i], raw_tokens[i+1]
+                two_word = f"{t1} {t2}"
+                
+                # Check for predefined phrases first
+                found_type = None
+                if two_word in KETERANGAN: found_type = "KETERANGAN"
+                elif two_word in PREDIKAT: found_type = "PREDIKAT"
+                elif two_word in AUX: found_type = "AUX"
+                
+                # Generalized logic: AUX + (SUBJEK/PREDIKAT/OBJEK/KETERANGAN)
+                if not found_type and t1 in AUX:
+                    if t2 in PREDIKAT: found_type = "PREDIKAT"
+                    elif t2 in KETERANGAN: found_type = "KETERANGAN"
+                    elif t2 in SUBJEK: found_type = "SUBJEK"
+                    elif t2 in OBJEK: found_type = "OBJEK"
+                
+                if found_type:
+                    # Determine sub-token types
+                    t1_type = "AUX" if t1 in AUX or t1 in ["di", "ka", "mo", "ada", "so"] else found_type
+                    t2_type = found_type
+                    
+                    tokenized.append({
+                        "text": two_word, 
+                        "type": found_type,
+                        "sub_tokens": [
+                            {"text": t1, "type": t1_type},
+                            {"text": t2, "type": t2_type}
+                        ]
+                    })
                     i += 2
                     continue
             
@@ -137,8 +163,22 @@ class ManadoAnalyzer:
         mermaid_lines.append("ROOT[Struktur Kalimat SPOK]")
         
         def safe_id(prefix, text, idx):
+            # Replace any non-alphanumeric character with underscore
             clean_text = re.sub(r'[^a-zA-Z0-9]', '_', text)
+            # Ensure it doesn't start with a number (CSS selector safety)
             return f"{prefix}_{clean_text}_{idx}"
+
+        TYPE_LABELS = { # Tier 1: Full Names
+            "SUBJEK": "Subjek S", "AUX": "Kata Bantu Aux", "PREDIKAT": "Predikat P", 
+            "OBJEK": "Objek O", "KETERANGAN": "Keterangan K", "PARTIKEL": "Partikel Pel",
+            "POSSESSIVE": "Possessive", "UNKNOWN": "Unknown"
+        }
+        
+        ABBR_LABELS = { # Tier 2/3: Abbreviations
+            "SUBJEK": "S", "AUX": "Aux", "PREDIKAT": "P", 
+            "OBJEK": "O", "KETERANGAN": "K", "PARTIKEL": "Pel",
+            "POSSESSIVE": "Poss", "UNKNOWN": "?"
+        }
 
         structure_map = [
             ("SUBJEK", subjek_tokens, "Subjek S"),
@@ -168,10 +208,30 @@ class ManadoAnalyzer:
             
             for idx, t in enumerate(tokens):
                 word_id = safe_id(type_code, t['text'], idx)
-                mermaid_lines.append(f"{cat_id} --> {word_id}[\"{t['text']}\"]:::word")
                 
-                derivation.append(f"{step_counter}. {type_code} → '{t['text']}'")
-                step_counter += 1
+                if "sub_tokens" in t:
+                    # Intermediate Phrase Node
+                    phrase_node_id = f"PHRASE_{word_id}"
+                    mermaid_lines.append(f"{cat_id} --> {phrase_node_id}(\"{t['text']}\"):::phrase")
+                    
+                    sub_types_abbr = []
+                    for s_idx, st in enumerate(t["sub_tokens"]):
+                        sub_id = safe_id(f"{phrase_node_id}_SUB", st['text'], s_idx)
+                        st_label = ABBR_LABELS.get(st['type'], st['type'])
+                        mermaid_lines.append(f"{phrase_node_id} --> {sub_id}[\"{st['text']} ({st_label})\"]:::word")
+                        sub_types_abbr.append(st_label)
+                    
+                    # Derivation split using abbreviations for Tier 2+
+                    derivation.append(f"{step_counter}. {TYPE_LABELS.get(type_code, type_code)} → {' '.join(sub_types_abbr)}")
+                    step_counter += 1
+                    for s_idx, st in enumerate(t["sub_tokens"]):
+                        st_label = ABBR_LABELS.get(st['type'], st['type'])
+                        derivation.append(f"{step_counter}. {st_label} → '{st['text']}'")
+                        step_counter += 1
+                else:
+                    mermaid_lines.append(f"{cat_id} --> {word_id}[\"{t['text']}\"]:::word")
+                    derivation.append(f"{step_counter}. {TYPE_LABELS.get(type_code, type_code)} → '{t['text']}'")
+                    step_counter += 1
 
         # TRANSLASI (INDONESIA)
         ALL_DICTS = {**SUBJEK, **AUX, **PREDIKAT, **OBJEK, **KETERANGAN, **PARTIKEL, **POSSESSIVE}
@@ -191,6 +251,7 @@ class ManadoAnalyzer:
         mermaid_lines.append("classDef default fill:#fff,stroke:#ec4899,stroke-width:2px,rx:10,ry:10,color:#831843,font-family:'Outfit';")
         mermaid_lines.append("classDef root fill:#831843,stroke:#ec4899,stroke-width:4px,color:#fff,rx:15,ry:15;")
         mermaid_lines.append("classDef grammar fill:#fdf2f8,stroke:#ec4899,stroke-width:2px,color:#831843;")
+        mermaid_lines.append("classDef phrase fill:#fff7ed,stroke:#f97316,stroke-width:2px,color:#9a3412,rx:8,ry:8;")
         mermaid_lines.append("classDef word fill:#fff1f2,stroke:#db2777,stroke-width:1px,stroke-dasharray: 5 5,color:#be185d;")
         
         # Apply classes

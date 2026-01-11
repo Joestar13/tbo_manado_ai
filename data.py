@@ -23,7 +23,7 @@ AUX = {
     "dapa": "bisa/dapat", "tengah": "sedang", "baru": "baru", "lalu": "lalu", 
     "le": "juga", "masi": "masih", "hendak": "hendak", "akan": "akan", 
     "sedang": "sedang", "sudah": "sudah", "pernah": "pernah", "mo pigi": "akan pergi",
-    "mou": "mau", "ndak": "tidak", "singgah": "mampir"
+    "mou": "mau", "ndak": "tidak", "singgah": "mampir", "di": "di", "ka": "ke"
 }
 
 PARTIKEL = {
@@ -62,7 +62,8 @@ PREDIKAT = {
     "berdiri": "berdiri", "sonde": "tidak ada", "cari": "cari",
     "kasiang": "kasihan", "cinta": "cinta",
     "benci": "benci", "takut": "takut", "marah": "marah", "senang": "senang",
-    "sedih": "sedih", "kaget": "kaget", "heran": "heran", "bingung": "bingung"
+    "sedih": "sedih", "kaget": "kaget", "heran": "heran", "bingung": "bingung",
+    "mo makan": "akan makan", "mo pigi": "akan pergi"
 }
 
 OBJEK = {
@@ -116,5 +117,10 @@ KETERANGAN = {
     "panas": "panas", "dingin": "dingin", "ujan": "hujan", "mendung": "mendung",
     "cerah": "cerah", "angin": "berangin", "badai": "badai",
     "merah": "merah", "biru": "biru", "kuning": "kuning", "hijau": "hijau",
-    "hitam": "hitam", "putih": "putih", "abu": "abu-abu", "pink": "merah muda"
+    "hitam": "hitam", "putih": "putih", "abu": "abu-abu", "pink": "merah muda",
+    "rumah": "rumah", "sekolah": "sekolah", "dapur": "dapur", "pantai": "pantai", 
+    "pasar": "pasar", "jalan": "jalan", "kantor": "kantor", "gereja": "gereja", 
+    "masjid": "masjid",    "mall": "mall", "lapangan": "lapangan", "laut": "laut", 
+    "gunong": "gunung", "ka pasar": "ke pasar", "ka rumah": "ke rumah", 
+    "ka sekolah": "ke sekolah"
 }
