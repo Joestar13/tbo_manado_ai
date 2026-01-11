@@ -13,11 +13,15 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- SVG Pan Zoom -->
-    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
 
     <script>
-        mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#fce7f3', lineColor: '#ec4899' } });
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: { primaryColor: '#fce7f3', lineColor: '#ec4899' },
+            useMaxWidth: false,
+            flowchart: { useMaxWidth: false, htmlLabels: true }
+        });
         tailwind.config = {
             theme: {
                 extend: {
@@ -321,14 +325,13 @@
                         <div class="flex justify-between items-center mb-4 relative z-10">
                             <h3 class="font-bold text-lg">Visual Parse Tree</h3>
                             <div class="flex gap-2">
-                                <span
-                                    class="px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-bold">Interactive
-                                    Pan & Zoom</span>
+                                <span class="px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-bold">Dynamic
+                                    Sizing</span>
                             </div>
                         </div>
                         <div id="mermaid-container"
-                            class="flex-1 flex justify-center items-center overflow-hidden border border-pink-100/50 rounded-xl bg-white/30 backdrop-blur-sm cursor-grab active:cursor-grabbing">
-                            <div class="mermaid w-full h-full flex justify-center items-center">
+                            class="flex-1 w-full overflow-x-auto border border-pink-100/50 rounded-xl bg-white/30 backdrop-blur-sm custom-scrollbar p-8">
+                            <div class="mermaid flex justify-center items-center">
                                 {{ result.mermaid | safe }}
                             </div>
                         </div>
@@ -394,20 +397,6 @@
             });
         });
 
-        // Mermaid Pan Zoom
-        window.addEventListener('load', () => {
-            const mermaidSvg = document.querySelector('#mermaid-container svg');
-            if (mermaidSvg) {
-                svgPanZoom(mermaidSvg, {
-                    zoomEnabled: true,
-                    controlIconsEnabled: true,
-                    fit: true,
-                    center: true,
-                    minZoom: 0.1,
-                    maxZoom: 10
-                });
-            }
-        });
 
         function replaceWord(typo, correction) {
             const input = document.querySelector('input[name="kalimat"]');
