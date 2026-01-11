@@ -21,19 +21,31 @@ class ManadoAnalyzer:
                 two_word = f"{t1} {t2}"
                 found_type = None
                 
-                # Check for predefined phrases first
+                # Check for predefined phrases first (All categories)
                 if two_word in KETERANGAN: found_type = "KETERANGAN"
                 elif two_word in PREDIKAT: found_type = "PREDIKAT"
                 elif two_word in AUX: found_type = "AUX"
+                elif two_word in SUBJEK: found_type = "SUBJEK"
+                elif two_word in OBJEK: found_type = "OBJEK"
                 
                 # Generalized logic: AUX + (SUBJEK/PREDIKAT/OBJEK/KETERANGAN)
                 if not found_type and t1 in AUX:
                     # Priority 1: Prepositions (di/ka) -> KETERANGAN
                     if t1 in ["di", "ka", "dari", "pas"]:
                         found_type = "KETERANGAN"
-                    # Priority 2: Time Markers (so/mo/da/ada) -> PREDIKAT
+                    # Priority 2: Time Markers (so/mo/da/ada) -> PREDIKAT (if t2 is likely predikat)
                     elif t1 in ["so", "mo", "da", "ada", "bolom", "blum", "bulum"]:
-                        found_type = "PREDIKAT"
+                        if t2 in PREDIKAT:
+                            found_type = "PREDIKAT"
+                        elif t2 in KETERANGAN:
+                            found_type = "KETERANGAN"
+                        elif t2 in SUBJEK:
+                            # If it matches SUBJEK (like "da orang"), it might be a single token later
+                            # or caught by phrase detection above. 
+                            # If we are here, phrase detection missed it.
+                            found_type = None # Let it fall through to single token logic
+                        else:
+                            found_type = "PREDIKAT" # Default for markers
                     # Priority 3: Fallback based on t2
                     elif t2 in PREDIKAT: found_type = "PREDIKAT"
                     elif t2 in KETERANGAN: found_type = "KETERANGAN"
@@ -82,71 +94,29 @@ class ManadoAnalyzer:
         subjek_tokens = [t for t in tokenized if t["type"] == "SUBJEK"]
         predikat_tokens = [t for t in tokenized if t["type"] == "PREDIKAT"]
         
-        if not subjek_tokens or not predikat_tokens:
-            analysis_report.append("✖ Struktur tidak lengkap (Minimal S + P).")
-            rule_violations += 1
-        else:
-            invalid_pronouns = {"saya": "kita", "aku": "kita", "anda": "ngana", "kamu": "ngana", "mereka": "dorang", "kami": "torang"}
-            for s in subjek_tokens:
-                if s["text"] in invalid_pronouns:
-                    replacement = invalid_pronouns[s["text"]]
-                    analysis_report.append(f"✖ Kata ganti formal: '{s['text']}'.")
-                    recommendations.append(f"Ganti '{s['text']}' dengan '{replacement}' (Standard BMM).")
-                    rule_violations += 1
-                else:
-                    analysis_report.append(f"✔ Subjek '{s['text']}' valid.")
-
-        aux_tokens = [t for t in tokenized if t["type"] == "AUX"]
-        has_time_marker = any(t["text"] in ["so", "mo", "ada", "sedang", "akan", "sudah"] for t in aux_tokens)
-        has_ba_prefix = any(t["text"].startswith("ba") for t in predikat_tokens)
-        
-        if has_time_marker or has_ba_prefix:
-            marker = "Prefix ba-" if has_ba_prefix else f"Partikel '{aux_tokens[0]['text']}'" if aux_tokens else "Time Marker"
-            analysis_report.append(f"✔ Kala/Waktu terdeteksi ({marker}).")
-        else:
-            if predikat_tokens:
-                analysis_report.append("⚠ Peringatan: Absen penanda waktu (so/mo/ada/ba-).")
-        
-        for idx, t in enumerate(tokenized):
-            if t["text"] == "pe":
-                if idx > 0 and idx < len(tokenized)-1:
-                    analysis_report.append(f"✔ Pola kepemilikan '{tokenized[idx-1]['text']} pe {tokenized[idx+1]['text']}' valid.")
-                else:
-                    analysis_report.append("✖ Pola 'pe' gantung/tidak lengkap.")
-                    rule_violations += 1
-        
-        for t in tokenized:
-            if t["text"] in ["tidak", "tak", "nggak", "gak"]:
-                analysis_report.append(f"✖ Negasi '{t['text']}' tidak baku.")
-                recommendations.append(f"Ganti '{t['text']}' dengan 'nyanda' atau 'nda'.")
-                rule_violations += 1
-        
-        # DETEKSI TIPE KALIMAT & RAGAM (MOVED HERE - BEFORE message_html)
+        # 1. Cek Tipe Kalimat & Ragam Dasar
         sentence_type = "Kalimat Berita (Deklaratif)"
         voice_type = "Aktif (Active)"
         
-        # 1. Cek Kalimat Tanya
+        # Cek Kalimat Tanya
         question_words = ["sapa", "apa", "dimane", "kiapa", "bagimana", "kapan", "barapa", "mana"]
         question_particles = ["kang", "dang", "sto"]
         is_question = any(t["text"] in question_words for t in tokenized) or \
                       (tokenized and tokenized[-1]["text"] in question_particles) or \
                       "?" in kalimat
-                      
         if is_question:
             sentence_type = "Kalimat Tanya (Interogatif)"
             
-        # 2. Cek Kalimat Perintah
+        # Cek Kalimat Perintah
         imperative_particles = ["jo", "mari", "coba"]
         is_imperative = (tokenized and tokenized[-1]["text"] == "jo") or \
                         any(t["text"] in imperative_particles for t in tokenized) or \
                         "!" in kalimat
-                        
         if is_imperative and not is_question:
             sentence_type = "Kalimat Perintah (Imperatif)"
 
-        # 3. Cek Ragam (Aktif/Pasif/Nominal)
+        # Cek Ragam (Aktif/Pasif/Nominal)
         has_passive_marker = False
-        
         for t in predikat_tokens:
             if t["text"].startswith("ta") or t["text"] == "dapa" or t["text"].startswith("ka"):
                 has_passive_marker = True
@@ -154,9 +124,75 @@ class ManadoAnalyzer:
         if has_passive_marker:
             voice_type = "Pasif (Passive)"
         elif not predikat_tokens:
-             voice_type = "Nominal / Tidak Lengkap"
+            voice_type = "Nominal / Tidak Lengkap"
+        else:
+            voice_type = "Aktif (Active)"
 
-        # Add to report BEFORE generating HTML
+        # 2. Time Marker & Prefix Ba- Logic
+        aux_tokens = [t for t in tokenized if t["type"] == "AUX"]
+        has_time_marker = any(t["text"] in ["so", "mo", "ada", "sedang", "akan", "sudah"] for t in aux_tokens)
+        has_ba_prefix = any(t["text"].startswith("ba") for t in predikat_tokens)
+        
+        if has_time_marker or has_ba_prefix:
+            marker = "Prefix ba-" if has_ba_prefix else f"Partikel '{aux_tokens[0]['text']}'" if aux_tokens else "Time Marker"
+            analysis_report.append(f"✔ Kala/Waktu terdeteksi ({marker}).")
+        elif predikat_tokens and voice_type == "Aktif (Active)":
+            analysis_report.append("⚠ Peringatan: Absen penanda waktu (so/mo/ada/ba-).")
+
+        # 3. Pattern 'pe' & Negation Logic
+        for idx, t in enumerate(tokenized):
+            if t["text"] == "pe":
+                if idx > 0 and idx < len(tokenized)-1:
+                    analysis_report.append(f"✔ Pola kepemilikan '{tokenized[idx-1]['text']} pe {tokenized[idx+1]['text']}' valid.")
+                else:
+                    analysis_report.append("✖ Pola 'pe' gantung/tidak lengkap.")
+                    rule_violations += 1
+            if t["text"] in ["tidak", "tak", "nggak", "gak"]:
+                analysis_report.append(f"✖ Negasi '{t['text']}' tidak baku.")
+                recommendations.append(f"Ganti '{t['text']}' dengan 'nyanda' atau 'nda'.")
+                rule_violations += 1
+
+        # 4. SPOK sequence validation
+        seq_tokens = [t for t in tokenized if t["type"] in ["SUBJEK", "PREDIKAT", "OBJEK", "KETERANGAN"]]
+        seq_types = [t["type"] for t in seq_tokens]
+        
+        if not subjek_tokens or not predikat_tokens:
+            if not subjek_tokens and not predikat_tokens:
+                if voice_type != "Nominal / Tidak Lengkap":
+                    analysis_report.append("✖ Struktur tidak ditemukan (Harus ada Subjek dan Predikat).")
+                    rule_violations += 1
+            elif not subjek_tokens:
+                analysis_report.append("✖ Subjek tidak ditemukan.")
+                rule_violations += 1
+            else:
+                analysis_report.append("✖ Predikat tidak ditemukan.")
+                rule_violations += 1
+        else:
+            if voice_type == "Aktif (Active)":
+                s_idx = seq_types.index("SUBJEK") if "SUBJEK" in seq_types else -1
+                p_idx = seq_types.index("PREDIKAT") if "PREDIKAT" in seq_types else -1
+                o_idx = seq_types.index("OBJEK") if "OBJEK" in seq_types else -1
+                
+                if p_idx < s_idx:
+                    analysis_report.append(f"✖ Urutan salah: Predikat '{seq_tokens[p_idx]['text']}' mendahului Subjek '{seq_tokens[s_idx]['text']}'.")
+                    rule_violations += 1
+                elif o_idx != -1 and o_idx < p_idx:
+                    analysis_report.append(f"✖ Urutan salah: Objek '{seq_tokens[o_idx]['text']}' mendahului Predikat '{seq_tokens[p_idx]['text']}'.")
+                    rule_violations += 1
+                else:
+                    analysis_report.append("✔ Urutan SPOK valid (Kalimat Aktif).")
+            elif voice_type == "Pasif (Passive)":
+                analysis_report.append("✔ Urutan valid (Kalimat Pasif).")
+
+        # Pronoun Check
+        invalid_pronouns = {"saya": "kita", "aku": "kita", "anda": "ngana", "kamu": "ngana", "mereka": "dorang", "kami": "torang"}
+        for s in subjek_tokens:
+             if s["text"] in invalid_pronouns:
+                replacement = invalid_pronouns[s["text"]]
+                analysis_report.append(f"✖ Kata ganti formal: '{s['text']}'.")
+                recommendations.append(f"Ganti '{s['text']}' dengan '{replacement}' (Standard BMM).")
+                rule_violations += 1
+
         analysis_report.append(f"ℹ Tipe: {sentence_type} | Ragam: {voice_type}")
         
         is_valid = rule_violations == 0

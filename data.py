@@ -7,7 +7,7 @@ SUBJEK = {
     "kaka": "kakak", "om": "paman", "tanta": "bibi", "opa": "kakek", 
     "oma": "nenek", "cewe": "perempuan", "cowo": "laki-laki", "orang": "orang", 
     "dokter": "dokter", "guru": "guru", "polisi": "polisi", "tentara": "tentara", 
-    "nyong": "pemuda", "nona": "nona", "maener": "bapak guru", "da orang": "ada orang",
+    "nyong": "pemuda", "nona": "nona", "maener": "bapak guru", "da orang": "ada orang", "orang": "orang",
     "sapa": "siapa", "tuama": "laki-laki", "wewene": "perempuan", "cees": "sahabat", 
     "tamang": "teman", "bos": "bos", "kapten": "kapten", "presiden": "presiden", 
     "tua": "orang tua", "muda": "anak muda", "laki": "suami", "bini": "istri",
